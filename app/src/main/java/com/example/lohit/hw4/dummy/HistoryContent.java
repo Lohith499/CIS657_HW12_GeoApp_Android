@@ -25,9 +25,9 @@ public class HistoryContent {
                 now.minusDays(1)));
         addItem(new HistoryItem("42.12444", "-77.3523", "42.1234", "85.3555",
                 now.minusDays(1)));
-        addItem(new HistoryItem("43.12444", "-85.3523", "42.1234", "85.3555",
+        addItem(new HistoryItem("45.12444", "-68.3523", "12.1234", "41.3555",
                 now.plusDays(1)));
-        addItem(new HistoryItem("55.12444", "-85.3523", "42.1234", "85.3555",
+        addItem(new HistoryItem("25.12444", "-55.3523", "36.1234", "18.3555",
                 now.plusDays(1)));
     }
     // match with inputs with 4 params
