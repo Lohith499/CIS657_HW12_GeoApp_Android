@@ -99,12 +99,11 @@ public class HistoryAdapter extends SectionedRecyclerViewAdapter<HistoryAdapter.
 
     @Override
     protected void onBindItemViewHolder(final ViewHolder holder, int section, int position) {
+
         holder.mItem =
                 this.dayValues.get(this.sectionHeaders.get(section)).get(position);
-        holder.mP1.setText("(" + holder.mItem.getOrigLat() + "," + holder.mItem.getOrigLng()
-                + ")");
-        holder.mP2.setText("(" + holder.mItem.getEndLat() + "," + holder.mItem.getEndLng()
-                + ")");
+        holder.mP1.setText("(" + holder.mItem.getOrigLat() + "," + holder.mItem.getOrigLng() + ")");
+        holder.mP2.setText("(" + holder.mItem.getEndLat() + "," + holder.mItem.getEndLng() + ")");
         holder.mDateTime.setText(holder.mItem.getTimestamp().toString());
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,21 +117,22 @@ public class HistoryAdapter extends SectionedRecyclerViewAdapter<HistoryAdapter.
         });
     }
 
+
 //    @Override
 //    public void onBindViewHolder(final ViewHolder holder, int position) {
-//        holder.mItem = mValues.get(position);
-//        holder.mP1.setText("(" + holder.mItem.origLat + "," + holder.mItem.origLng
+//        holder.mItem =
+//                this.dayValues.get(this.sectionHeaders.get(section)).get(position);
+//        holder.mP1.setText("(" + holder.mItem.getOrigLat() + "," + holder.mItem.getOrigLng()
 //                + ")");
-//        holder.mP2.setText("(" + holder.mItem.destLat + "," + holder.mItem.destLng
+//        holder.mP2.setText("(" + holder.mItem.getEndLat() + "," + holder.mItem.getEndLng()
 //                + ")");
-//        holder.mDateTime.setText(holder.mItem.timestamp.toString());
-//
+//        holder.mDateTime.setText(holder.mItem.getTimestamp().toString());
 //        holder.mView.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
 //                if (null != mListener) {
-//                    // Notify the active callbacks interface (the activity, if the
-//                    // fragment is attached to one) that an item has been selected.
+//// Notify the active callbacks interface (the activity, if the
+//// fragment is attached to one) that an item has been selected.
 //                    mListener.onListFragmentInteraction(holder.mItem);
 //                }
 //            }
