@@ -4,12 +4,16 @@
 
 package com.example.lohit.hw4;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.location.Location;
 import android.os.Parcelable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -17,11 +21,11 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
-
+import com.example.lohit.hw4.webservice.WeatherService;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -38,20 +42,23 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-
-
+import com.example.lohit.hw4.webservice.WeatherService.*;
 import static android.text.TextUtils.split;
+import static com.example.lohit.hw4.webservice.WeatherService.BROADCAST_WEATHER;
+
 
 
 public class HomePage extends AppCompatActivity  {
     DatabaseReference topRef;
     EditText x1,y1,x2,y2;
     Button bcal,bclear,search;
-    TextView dist,bear,error;
+    TextView dist,bear,error, p1Temp,p2Temp,p1Summary,p2Summary;
     String dmeasure, bmeasure;
+    ImageView p1Icon,p2Icon;
     public static int HISTORY_RESULT = 2;
     public static int SETTINGS_RESULT = 1;
     public static int LOCATION_SEARCH = 3;
+
 
 
     public static List<LocationLookup> allHistory;
@@ -71,6 +78,13 @@ public class HomePage extends AppCompatActivity  {
         bclear = (Button) findViewById(R.id.bClear);
         dist = (TextView) findViewById(R.id.textViewdistance);
         bear = (TextView) findViewById(R.id.textViewbearinf);
+        p1Temp= (TextView) findViewById(R.id.temp1);
+        p2Temp= (TextView) findViewById(R.id.temp2);
+        p1Summary= (TextView) findViewById(R.id.summary1);
+        p2Summary= (TextView) findViewById(R.id.summary2);
+        p1Icon = (ImageView) findViewById(R.id.icon1);
+        p2Icon = (ImageView) findViewById(R.id.icon2);
+
         allHistory = new ArrayList<LocationLookup>();
 
 
@@ -135,13 +149,21 @@ public class HomePage extends AppCompatActivity  {
                 dist.setText("");
                 bear.setText("");
                 //error.setText("");
+                setWeatherViews(View.INVISIBLE);
             }
         });
 
 
     }
 
-
+    private void setWeatherViews(int visible) {
+        p1Icon.setVisibility(visible);
+        p2Icon.setVisibility(visible);
+        p1Summary.setVisibility(visible);
+        p2Summary.setVisibility(visible);
+        p1Temp.setVisibility(visible);
+        p2Temp.setVisibility(visible);
+    }
     public void update(){
         String sx1 = x1.getText().toString();
         String sy1 = y1.getText().toString();
@@ -216,6 +238,9 @@ public class HomePage extends AppCompatActivity  {
             bear.setText(df.format(b)+"Degrees");
         }
 
+        WeatherService.startGetWeather(this, Double.toString(lat1D), Double.toString(lon1D), "p1");
+        WeatherService.startGetWeather(this, Double.toString(lat2D), Double.toString(lon2D), "p2");
+        setWeatherViews(View.VISIBLE);
         /*HistoryContent.HistoryItem item = new
                 HistoryContent.HistoryItem(this.x1.getText().toString(),
                 this.y1.getText().toString(), this.x2.getText().toString(), this.y2.getText().toString(), DateTime.now());
@@ -227,16 +252,47 @@ public class HomePage extends AppCompatActivity  {
     public void onResume(){
         super.onResume();
         allHistory.clear();
+
         topRef = FirebaseDatabase.getInstance().getReference("history");
         topRef.addChildEventListener (chEvListener);
-//topRef.addValueEventListener(valEvListener);
+        IntentFilter weatherFilter = new IntentFilter(BROADCAST_WEATHER);
+        LocalBroadcastManager.getInstance(this).registerReceiver(weatherReceiver,
+                weatherFilter);
+         setWeatherViews(View.INVISIBLE);
+        //topRef.addValueEventListener(valEvListener);
     }
     @Override
     public void onPause(){
         super.onPause();
         topRef.removeEventListener(chEvListener);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(weatherReceiver);
     }
 
+
+    private BroadcastReceiver weatherReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+           Log.d("LOHITH", "onReceive: " + intent);
+            Bundle bundle = intent.getExtras();
+            double temp = bundle.getDouble("TEMPERATURE");
+            String summary = bundle.getString("SUMMARY");
+            String icon = bundle.getString("ICON").replaceAll("-", "_");
+            String key = bundle.getString("KEY");
+            int resID = getResources().getIdentifier(icon , "drawable",
+                    getPackageName());
+            setWeatherViews(View.VISIBLE);
+            if (key.equals("p1")) {
+                p1Summary.setText(summary);
+                p1Temp.setText(Double.toString(temp));
+                p1Icon.setImageResource(resID);
+                p1Icon.setVisibility(View.INVISIBLE);
+            } else {
+                p2Summary.setText(summary);
+                p2Temp.setText(Double.toString(temp));
+                p2Icon.setImageResource(resID);
+            }
+        }
+    };
 
 
 
